@@ -1,0 +1,271 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="using:CSharpToUtf8"
+        mc:Ignorable="d" d:DesignWidth="960" d:DesignHeight="680"
+        x:Class="CSharpToUtf8.MainWindow"
+        Title="CSharpToUtf8 — C# 編碼轉 UTF-8"
+        Width="960" Height="680"
+        MinWidth="720" MinHeight="480"
+        Background="{DynamicResource ThemeBackgroundBrush}">
+    <Window.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="16" />
+        </Style>
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+        <Style Selector="TextBlock.column-header">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}" />
+            <Setter Property="Opacity" Value="0.7" />
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Padding" Value="20,8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.filter-chip">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4,2" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style Selector="Button.filter-chip:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightBrush}" />
+        </Style>
+        <Style Selector="Button.filter-chip.active">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}" />
+        </Style>
+        <Style Selector="Button.filter-chip:disabled">
+            <Setter Property="Opacity" Value="0.45" />
+        </Style>
+        <Style Selector="ListBox#ResultsList">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="ListBox#ResultsList ListBoxItem">
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+        <Style Selector="ListBox#ResultsList ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}" />
+            <Setter Property="Opacity" Value="0.18" />
+        </Style>
+        <Style Selector="ListBox#ResultsList ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightBrush}" />
+        </Style>
+    </Window.Styles>
+
+    <Panel>
+        <Grid Margin="20" RowDefinitions="Auto,*,Auto" RowSpacing="16">
+        <Border Grid.Row="0" Classes="card">
+            <StackPanel Spacing="14">
+                <TextBlock Classes="section-title" Text="轉換設定" />
+
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                    <TextBlock Grid.Column="0"
+                               Text="資料夾"
+                               VerticalAlignment="Center"
+                               Opacity="0.85" />
+                    <Border Grid.Column="1"
+                            Background="{DynamicResource ThemeControlMidBrush}"
+                            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="10,8">
+                        <TextBlock x:Name="FolderPathText"
+                                   Text="（尚未選擇）"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   Opacity="0.9" />
+                    </Border>
+                    <Button Grid.Column="2"
+                            x:Name="PickFolderButton"
+                            Content="選擇資料夾"
+                            Click="OnPickFolderClick"
+                            Padding="16,8" />
+                </Grid>
+
+                <StackPanel Spacing="6" Margin="0,2,0,0">
+                    <CheckBox x:Name="AddBomCheck"
+                              Content="addBom — 轉出的 UTF-8 帶 BOM" />
+                    <CheckBox x:Name="OverrideCheck"
+                              Content="overrideExistingUtf8Bom — 覆寫已是 UTF-8 檔案的 BOM 狀態" />
+                </StackPanel>
+
+                <Button x:Name="RunButton"
+                        Classes="primary accent"
+                        Content="執行轉換"
+                        Click="OnRunClick"
+                        HorizontalAlignment="Left"
+                        Margin="0,4,0,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- 結果列表 -->
+        <Border Grid.Row="1" Classes="card" Padding="0">
+            <DockPanel>
+                <Grid DockPanel.Dock="Top"
+                      ColumnDefinitions="2.2*,1.2*,72,88,1.1*,2*"
+                      Margin="16,14,16,8">
+                    <TextBlock Grid.Column="0" Classes="column-header" Text="檔案" />
+                    <TextBlock Grid.Column="1" Classes="column-header" Text="偵測編碼" />
+                    <TextBlock Grid.Column="2" Classes="column-header" Text="信心度" />
+                    <TextBlock Grid.Column="3" Classes="column-header" Text="BOM" />
+                    <TextBlock Grid.Column="4" Classes="column-header" Text="狀態" />
+                    <TextBlock Grid.Column="5" Classes="column-header" Text="備註" />
+                </Grid>
+
+                <Border DockPanel.Dock="Top"
+                        Height="1"
+                        Margin="16,0"
+                        Background="{DynamicResource ThemeBorderLowBrush}" />
+
+                <TextBlock x:Name="EmptyResultsHint"
+                           DockPanel.Dock="Top"
+                           Text="選擇資料夾並執行轉換後，結果會顯示於此（點擊檔案可在編輯器中開啟）"
+                           Margin="16,24"
+                           HorizontalAlignment="Center"
+                           Opacity="0.45"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+
+                <ListBox x:Name="ResultsList"
+                         Margin="8,4,8,8"
+                         Tapped="OnResultTapped"
+                         DoubleTapped="OnResultTapped"
+                         KeyDown="OnResultsListKeyDown">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:ResultRowView">
+                            <Grid ColumnDefinitions="2.2*,1.2*,72,88,1.1*,2*"
+                                  ColumnSpacing="8">
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding FileName}"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"
+                                           ToolTip.Tip="{Binding FilePath}" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding DetectedCharset}"
+                                           VerticalAlignment="Center"
+                                           Opacity="0.9" />
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding ConfidenceText}"
+                                           VerticalAlignment="Center"
+                                           Opacity="0.85" />
+                                <TextBlock Grid.Column="3"
+                                           Text="{Binding BomKindText}"
+                                           VerticalAlignment="Center"
+                                           Opacity="0.85" />
+                                <TextBlock Grid.Column="4"
+                                           Text="{Binding ActionText}"
+                                           Foreground="{Binding ActionBrush}"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="5"
+                                           Text="{Binding Note}"
+                                           Foreground="{Binding NoteBrush}"
+                                           TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap"
+                                           VerticalAlignment="Center"
+                                           ToolTip.Tip="{Binding Note}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- 狀態列 -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource ThemeControlLowBrush}"
+                BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="14,10">
+            <Grid ColumnDefinitions="Auto,*">
+                <Ellipse x:Name="StatusIndicator"
+                         Width="8" Height="8"
+                         Margin="0,0,10,0"
+                         VerticalAlignment="Center"
+                         Fill="{DynamicResource ThemeAccentBrush}" />
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="2"
+                            VerticalAlignment="Center">
+                    <TextBlock x:Name="StatusPrefixText"
+                               Text="準備就緒"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap" />
+                    <TextBlock x:Name="StatusFilterSeparator"
+                               Text="｜"
+                               VerticalAlignment="Center"
+                               Opacity="0.5"
+                               IsVisible="False" />
+                    <Button x:Name="FilterConvertedButton"
+                            Classes="filter-chip"
+                            Content="轉換 0"
+                            IsVisible="False"
+                            Click="OnFilterConvertedClick" />
+                    <TextBlock x:Name="SepAfterConverted"
+                               Text="｜"
+                               VerticalAlignment="Center"
+                               Opacity="0.5"
+                               IsVisible="False" />
+                    <Button x:Name="FilterOverriddenButton"
+                            Classes="filter-chip"
+                            Content="覆寫 BOM 0"
+                            IsVisible="False"
+                            Click="OnFilterOverriddenClick" />
+                    <TextBlock x:Name="SepAfterOverridden"
+                               Text="｜"
+                               VerticalAlignment="Center"
+                               Opacity="0.5"
+                               IsVisible="False" />
+                    <Button x:Name="FilterSkippedButton"
+                            Classes="filter-chip"
+                            Content="跳過 0"
+                            IsVisible="False"
+                            Click="OnFilterSkippedClick" />
+                    <TextBlock x:Name="SepAfterSkipped"
+                               Text="｜"
+                               VerticalAlignment="Center"
+                               Opacity="0.5"
+                               IsVisible="False" />
+                    <Button x:Name="FilterWarningButton"
+                            Classes="filter-chip"
+                            Content="警告 0"
+                            IsVisible="False"
+                            Click="OnFilterWarningClick" />
+                    <TextBlock x:Name="SepAfterWarning"
+                               Text="｜"
+                               VerticalAlignment="Center"
+                               Opacity="0.5"
+                               IsVisible="False" />
+                    <Button x:Name="FilterErrorButton"
+                            Classes="filter-chip"
+                            Content="錯誤 0"
+                            IsVisible="False"
+                            Click="OnFilterErrorClick" />
+                </StackPanel>
+            </Grid>
+        </Border>
+        </Grid>
+
+        <local:ConversionProgressOverlay x:Name="ProgressOverlay"
+                                         HorizontalAlignment="Stretch"
+                                         VerticalAlignment="Stretch" />
+    </Panel>
+</Window>

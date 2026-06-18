@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CSharpToUtf8\CSharpToUtf8.csproj" />
+  <Project Path="Tests/Tests.csproj" Id="981672a9-b312-4962-9294-42d02eb1421a" />
+</Solution>

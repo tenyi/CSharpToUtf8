@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CSharpToUtf8.ConversionProgressOverlay"
+             IsVisible="False"
+             IsHitTestVisible="True">
+    <UserControl.Styles>
+        <Style Selector="Border.dialog-card">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="32,28" />
+            <Setter Property="MinWidth" Value="420" />
+            <Setter Property="MaxWidth" Value="480" />
+            <Setter Property="BoxShadow" Value="0 8 32 0 #40000000" />
+        </Style>
+    </UserControl.Styles>
+
+    <!-- 半透明遮罩 -->
+    <Grid Background="#66000000">
+        <Border Classes="dialog-card"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <StackPanel Spacing="18">
+                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                    <TextBlock Text="正在轉換編碼"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
+                    <TextBlock x:Name="PhaseText"
+                               Text="正在掃描資料夾…"
+                               FontSize="13"
+                               Opacity="0.75"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <ProgressBar x:Name="MainProgress"
+                             Height="5"
+                             Minimum="0"
+                             Maximum="100"
+                             IsIndeterminate="True" />
+
+                <StackPanel Spacing="6" HorizontalAlignment="Center" Margin="0,4,0,0">
+                    <TextBlock x:Name="CountText"
+                               Text="—"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource ThemeAccentBrush}" />
+                    <TextBlock x:Name="CountLabel"
+                               Text="掃描中"
+                               FontSize="13"
+                               Opacity="0.65"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <Border Height="1"
+                        Background="{DynamicResource ThemeBorderLowBrush}"
+                        Margin="0,2,0,0" />
+
+                <TextBlock x:Name="DetailText"
+                           Text=""
+                           FontSize="12"
+                           Opacity="0.7"
+                           TextTrimming="CharacterEllipsis"
+                           HorizontalAlignment="Center"
+                           MaxWidth="400" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
